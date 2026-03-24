@@ -12,7 +12,13 @@
 
     <div class="game-container">
         
-        <div id="scr-start" class="screen" style="display: flex;">
+        <div id="scr-logo" class="screen" style="display: flex; width: 100vw; height: 100vh; background-color: #000; cursor: pointer;" onclick="pularLogo()">
+            <video id="video-logo" style="width: 100%; max-height: 100vh; object-fit: contain;" autoplay muted onended="pularLogo()">
+                <source src="logo.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <div id="scr-start" class="screen" style="display: none;">
             <h1 style="font-size: 100px; margin: 0; color: #0f4; text-shadow: 0 0 20px #0f4;">T.I.A</h1>
             <p style="margin-bottom: 20px; letter-spacing: 5px;">SISTEMA DE DEFESA ATIVO</p>
             <button class="btn-ui" onclick="transitionTo('scr-names')">INICIAR SISTEMA</button>
@@ -130,6 +136,13 @@
                 if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
                 drops[i]++;
             }
+        }
+
+        // === NOVA FUNÇÃO PARA PULAR/FINALIZAR A LOGO ===
+        function pularLogo() {
+            const video = document.getElementById('video-logo');
+            if(video) video.pause();
+            change('scr-start');
         }
 
         function transitionTo(nextId) {
