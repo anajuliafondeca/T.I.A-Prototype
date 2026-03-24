@@ -1,13 +1,14 @@
 #include "crow_all.h"
 #include <iostream>
 #include <string>
+#include <cstdlib>
 
 int quemClicou = 0;
 
 int main() {
     crow::SimpleApp app;
 
-    // Força o Crow a procurar na pasta onde está o executável
+    // Configura o Crow para buscar HTML, CSS e Imagens dentro da pasta 'templates'
     crow::mustache::set_base("templates");
 
     // 1. ROTA DA TV (Página Principal)
@@ -20,7 +21,7 @@ int main() {
         return crow::mustache::load("controle.html").render();
     });
 
-    // 3. RECEBE O CLIQUE DO CELULAR
+    // 3. RECEBE O CLIQUE DO CELULAR (Buzzer)
     CROW_ROUTE(app, "/clique")([&](const crow::request& req){
         auto t = req.url_params.get("time");
         if(t != nullptr) {
@@ -28,7 +29,7 @@ int main() {
                 quemClicou = std::stoi(t);
                 std::cout << ">>> Time " << quemClicou << " apertou o buzzer!" << std::endl;
             } catch (...) {
-                std::cout << "Erro na conversão do time." << std::endl;
+                std::cout << "Erro na conversao do time." << std::endl;
             }
         }
         return crow::response(200);
@@ -41,29 +42,37 @@ int main() {
         return res;
     });
 
-    // 5. ROTA PARA CARREGAR TUDO (CSS, PNG, JPG) - CORRIGIDA
+    // 5. ROTA PARA CARREGAR ARQUIVOS ESTÁTICOS (CSS, PNG, JPG)
+    // Isso busca os arquivos dentro da pasta 'templates' conforme definido no set_base
     CROW_ROUTE(app, "/<string>")([](std::string filename){
-        auto page = crow::mustache::load(filename);
-        crow::response res(page.render());
-        
-        // Define o tipo de arquivo para o navegador não ignorar o CSS
-        if (filename.find(".css") != std::string::npos) {
-            res.set_header("Content-Type", "text/css");
-        } else if (filename.find(".png") != std::string::npos) {
-            res.set_header("Content-Type", "image/png");
+        try {
+            auto page = crow::mustache::load(filename);
+            crow::response res(page.render());
+            
+            // Define o tipo de conteúdo para o navegador entender o que é cada arquivo
+            if (filename.find(".css") != std::string::npos) {
+                res.set_header("Content-Type", "text/css");
+            } else if (filename.find(".png") != std::string::npos) {
+                res.set_header("Content-Type", "image/png");
+            } else if (filename.find(".jpg") != std::string::npos || filename.find(".jpeg") != std::string::npos) {
+                res.set_header("Content-Type", "image/jpeg");
+            }
+            return res;
+        } catch (...) {
+            return crow::response(404);
         }
-        return res;
     });
 
-    std::cout << "\n========================================" << std::endl;
-    std::cout << "SISTEMA T.I.A INICIADO" << std::endl;
-    std::cout << "Acesse: http://localhost:3000" << std::endl;
-    std::cout << "========================================\n" << std::endl;
-    
-    // Pega a porta do Render ou usa 3000 por padrão
+    // CONFIGURAÇÃO DE PORTA PARA O RENDER
+    // O Render atribui uma porta dinâmica, por isso usamos getenv("PORT")
     char* port = getenv("PORT");
     uint16_t portNumber = port ? (uint16_t)atoi(port) : 3000;
+
+    std::cout << "\n========================================" << std::endl;
+    std::cout << "SISTEMA T.I.A INICIADO ONLINE" << std::endl;
+    std::cout << "Porta utilizada: " << portNumber << std::endl;
+    std::cout << "========================================\n" << std::endl;
     
-    std::cout << "Servidor iniciado na porta " << portNumber << std::endl;
+    // Inicia o servidor
     app.port(portNumber).multithreaded().run();
 }
