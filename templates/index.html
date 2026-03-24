@@ -28,9 +28,8 @@
         </div>
 
         <div id="scr-logo" class="screen" style="display: none; width: 100vw; height: 100vh; background-color: #000;">
-            <video id="video-logo" style="width: 100%; height: 100%; max-height: 100vh; object-fit: contain;" playsinline>
-                <source src="logo1.mp4" type="video/mp4">
-            </video>
+            <video id="video-logo" style="width: 100%; height: 100%; max-height: 100vh; object-fit: contain;" playsinline preload="auto" onended="pularLogo()">
+                <source src="logo.mp4" type="video/mp4"> </video>
         </div>
 
         <div id="scr-start" class="screen" style="display: none;">
@@ -129,8 +128,8 @@
             {q: "O que significa a sigla T.I.A?", a: "tecnologia e informatica aplicada"}
         ];
         let pAtual;
+        let jaPulou = false; // Variável para garantir que não pule duas vezes
 
-        // === LÓGICA DO EFEITO MATRIX ===
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -153,25 +152,30 @@
             }
         }
 
-        // === FUNÇÃO QUE LIBERA O VÍDEO APÓS O CLIQUE ===
         function iniciarLogo() {
-            // Esconde a tela de aviso e mostra a logo
             document.getElementById('scr-boot').style.display = 'none';
             document.getElementById('scr-logo').style.display = 'flex';
             
             const video = document.getElementById('video-logo');
-            video.muted = false; // Como o usuário clicou, já podemos até soltar o som!
-            video.play(); // Agora o navegador permite rodar perfeitamente
+            video.muted = false; 
+            video.play().catch(e => console.log("Erro ao dar play:", e));
 
-            // Conta os 3.5 segundos e pula
+            // TRAVA DE SEGURANÇA: Se o vídeo travar e o onended falhar, ele pula forçado em 4.5 segundos
             setTimeout(() => {
-                pularLogo();
-            }, 3500);
+                if (!jaPulou) {
+                    console.log("Failsafe ativado! O vídeo engasgou, pulando...");
+                    pularLogo();
+                }
+            }, 4500);
         }
 
         function pularLogo() {
+            if (jaPulou) return; // Se já pulou, ignora
+            jaPulou = true;
+            
             const video = document.getElementById('video-logo');
             if(video) video.pause();
+            
             transitionTo('scr-start'); 
         }
 
@@ -183,7 +187,7 @@
                 clearInterval(interval);
                 canvas.style.display = 'none';
                 change(nextId);
-            }, 1500); // 1.5 segundos de animação
+            }, 1500); 
         }
 
         function change(id) {
