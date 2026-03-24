@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONTROLE T.I.A</title>
+    <style>
+        body { 
+            background: #000; 
+            color: #0f4; 
+            font-family: 'Courier New', monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            height: 100vh; 
+            margin: 0; 
+            overflow: hidden;
+            text-align: center;
+        }
+        #btn-buzzer { 
+            width: 250px; 
+            height: 250px; 
+            background: transparent; 
+            border: 10px solid #0f4; 
+            color: #0f4; 
+            font-size: 35px; 
+            font-weight: bold;
+            border-radius: 50%; 
+            cursor: pointer; 
+            box-shadow: 0 0 25px #0f4; 
+            transition: 0.1s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        #btn-buzzer:active { 
+            background: #0f4; 
+            color: #000; 
+            transform: scale(0.9);
+            box-shadow: 0 0 50px #0f4;
+        }
+        .status { margin-bottom: 30px; font-size: 22px; text-transform: uppercase; }
+        .hint { margin-top: 20px; font-size: 14px; opacity: 0.7; }
+    </style>
+</head>
+<body>
+    <div class="status" id="info">CONECTANDO...</div>
+    
+    <button id="btn-buzzer" onclick="enviarClique()">SOU EU!</button>
+
+    <p class="hint">Aperte o botão para responder na TV</p>
+
+    <script>
+        // Pega o número do time (1 ou 2) que enviamos no QR Code
+        const params = new URLSearchParams(window.location.search);
+        const time = params.get('time');
+        
+        // Atualiza o texto na tela do celular
+        if(time) {
+            document.getElementById('info').innerText = "CONTROLE: TIME " + time;
+        }
+
+        function enviarClique() {
+            // Avisa o servidor C++ que este time clicou
+            fetch('/clique?time=' + time)
+                .then(() => {
+                    // Feedback visual rápido no celular
+                    console.log("Sinal enviado!");
+                })
+                .catch(err => {
+                    alert("Erro de conexão com o servidor!");
+                });
+        }
+    </script>
+</body>
+</html>

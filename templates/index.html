@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>T.I.A - Batalha Hacker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        /* Estilos para a seleção de personagens */
+        .avatar-container { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .avatar-card { text-align: center; cursor: pointer; transition: 0.3s; padding: 10px; border-radius: 10px; border: 2px solid transparent; }
+        .avatar-card img { width: 100px; height: 100px; object-fit: contain; }
+        .avatar-name { color: #fff; margin-top: 8px; font-family: 'Courier New', monospace; font-size: 14px; text-transform: uppercase; }
+
+        /* Cores de brilho solicitadas */
+        .glow-vermelho { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
+        .glow-amarelo { border-color: #ffff00; box-shadow: 0 0 20px #ffff00; }
+        .glow-verde { border-color: #00ff00; box-shadow: 0 0 20px #00ff00; }
+        .glow-roxo { border-color: #a020f0; box-shadow: 0 0 20px #a020f0; }
+        
+        .selected-p1 { border: 4px solid #fff !important; transform: scale(1.1); }
+        .selected-p2 { border: 4px dotted #fff !important; transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        
+        <div id="scr-start" class="screen" style="display: flex;">
+            <h1 style="font-size: 70px; margin: 0;">T.I.A</h1>
+            <button class="btn-ui" onclick="change('scr-names')">INICIAR SISTEMA</button>
+        </div>
+
+        <div id="scr-names" class="screen">
+            <h2>IDENTIFIQUE OS TIMES</h2>
+            <input type="text" id="n1" placeholder="NOME TIME 1">
+            <input type="text" id="n2" placeholder="NOME TIME 2">
+            <button class="btn-ui" onclick="saveNames()">PRÓXIMO</button>
+        </div>
+
+        <div id="scr-select" class="screen">
+            <h2>ESCOLHA SEU AVATAR</h2>
+            <p id="select-instruction" style="color: #0f4;">Vez do Time 1</p>
+            <div class="avatar-container">
+                <div class="avatar-card" id="char0" onclick="sel('player1.png', 'vermelho', 0)">
+                    <img src="player1.png">
+                    <div class="avatar-name">GHOST</div>
+                </div>
+                <div class="avatar-card" id="char1" onclick="sel('player2.png', 'amarelo', 1)">
+                    <img src="player2.png">
+                    <div class="avatar-name">SHADOW</div>
+                </div>
+                <div class="avatar-card" id="char2" onclick="sel('player3.png', 'verde', 2)">
+                    <img src="player3.png">
+                    <div class="avatar-name">NEON</div>
+                </div>
+                <div class="avatar-card" id="char3" onclick="sel('player4.png', 'roxo', 3)">
+                    <img src="player4.png">
+                    <div class="avatar-name">VOID</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="scr-qr" class="screen">
+            <h2>CONECTE OS CELULARES</h2>
+            <div style="display: flex; gap: 40px; justify-content: center; align-items: center;">
+                <div class="char-box">
+                    <p id="label-qr1" style="color:#0f4; font-weight: bold;"></p>
+                    <div id="qrcode1" style="background:#fff; padding:10px;"></div>
+                </div>
+                <h1 style="color:#fff">VS</h1>
+                <div class="char-box">
+                    <p id="label-qr2" style="color:#0f4; font-weight: bold;"></p>
+                    <div id="qrcode2" style="background:#fff; padding:10px;"></div>
+                </div>
+            </div>
+            <button class="btn-ui" onclick="start()" style="margin-top: 30px;">INICIAR BATALHA</button>
+        </div>
+
+        <div id="scr-game" class="screen">
+            <div id="timer" style="font-size: 30px; margin-bottom: 10px;">03:00</div>
+            <div class="arena">
+                <div id="box1" class="char-box">
+                    <img id="img1" class="char-img" width="150">
+                    <p id="ln1"></p>
+                    <div style="color: #fff;">CELULAR / [Q]</div>
+                    <div id="pts1">PONTOS: 0</div>
+                </div>
+                <div class="quiz-container">
+                    <h4 id="status">AGUARDANDO...</h4>
+                    <div id="q-text" style="font-size: 20px; min-height: 50px;"></div>
+                    <div id="input-area" style="display:none; margin-top: 15px;">
+                        <input type="text" id="ans" placeholder="DIGITE E APERTE ENTER" autocomplete="off">
+                    </div>
+                </div>
+                <div id="box2" class="char-box">
+                    <img id="img2" class="char-img" width="150">
+                    <p id="ln2"></p>
+                    <div style="color: #fff;">CELULAR / [P]</div>
+                    <div id="pts2">PONTOS: 0</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="scr-win" class="screen">
+            <h1 style="color: #0f4;">SISTEMA CONCLUÍDO</h1>
+            <div id="win-msg" style="font-size: 24px; color: white;"></div>
+            <button class="btn-ui" onclick="location.reload()" style="margin-top: 20px;">REINICIAR</button>
+        </div>
+    </div>
+
+    <script>
+        let t1, t2, p1_pts = 0, p2_pts = 0, respondendo = 0;
+        let totalSegundos = 180; 
+        let p1_color = "", p2_color = "";
+        let perguntas = [
+            {q: "Quanto é 50 + 50?", a: "100"},
+            {q: "Quanto é 9 x 9?", a: "81"},
+            {q: "HTML significa HyperText Markup Language?", a: "sim"},
+            {q: "Qual a capital do Brasil?", a: "brasilia"},
+            {q: "O que significa a sigla T.I.A?", a: "tecnologia e informatica aplicada"}
+        ];
+        let pAtual;
+
+        function change(id) {
+            document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+            const el = document.getElementById(id);
+            if (el) el.style.display = 'flex';
+        }
+
+        function saveNames() {
+            t1 = document.getElementById('n1').value || "Hacker 1";
+            t2 = document.getElementById('n2').value || "Hacker 2";
+            change('scr-select');
+        }
+
+        function sel(img, colorName, idx) {
+            const card = document.getElementById('char' + idx);
+            
+            if (!window.c1) { 
+                window.c1 = img; 
+                p1_color = colorName;
+                card.classList.add('glow-' + colorName, 'selected-p1');
+                document.getElementById('select-instruction').innerText = "Vez do " + t2;
+            } else if (!window.c2) { 
+                if (img === window.c1) { alert("Escolha um personagem diferente!"); return; }
+                window.c2 = img; 
+                p2_color = colorName;
+                card.classList.add('glow-' + colorName, 'selected-p2');
+                setTimeout(mostrarQR, 1000); 
+            }
+        }
+
+        function mostrarQR() {
+            change('scr-qr');
+            document.getElementById('label-qr1').innerText = t1;
+            document.getElementById('label-qr2').innerText = t2;
+            
+            document.getElementById("qrcode1").innerHTML = "";
+            document.getElementById("qrcode2").innerHTML = "";
+
+            const link = window.location.origin;
+
+            new QRCode(document.getElementById("qrcode1"), { 
+                text: link + "/controle?time=1", 
+                width: 150, height: 150 
+            });
+            new QRCode(document.getElementById("qrcode2"), { 
+                text: link + "/controle?time=2", 
+                width: 150, height: 150 
+            });
+        }
+
+        function start() {
+            document.getElementById('img1').src = window.c1;
+            document.getElementById('img2').src = window.c2;
+            document.getElementById('ln1').innerText = t1;
+            document.getElementById('ln2').innerText = t2;
+            change('scr-game');
+            setInterval(updateTimer, 1000);
+            setInterval(checarCelular, 500); 
+            novaQ();
+        }
+
+        function updateTimer() {
+            if (totalSegundos <= 0) return;
+            totalSegundos--;
+            let m = Math.floor(totalSegundos/60);
+            let s = totalSegundos%60;
+            document.getElementById('timer').innerText = `${m}:${s<10?'0'+s:s}`;
+            if (totalSegundos === 0) final();
+        }
+
+        function novaQ() {
+            pAtual = perguntas[Math.floor(Math.random()*perguntas.length)];
+            document.getElementById('q-text').innerText = pAtual.q;
+            document.getElementById('status').innerText = "ESPERANDO BUZZER...";
+            document.getElementById('input-area').style.display = 'none';
+            document.getElementById('box1').style.boxShadow = "none";
+            document.getElementById('box2').style.boxShadow = "none";
+            document.getElementById('ans').value = "";
+            respondendo = 0;
+        }
+
+        function checarCelular() {
+            if (respondendo !== 0) return;
+            fetch('/verificar_clique')
+                .then(r => r.text())
+                .then(time => {
+                    if (time === "1") ativ(1);
+                    else if (time === "2") ativ(2);
+                })
+                .catch(err => console.log("Servidor offline"));
+        }
+
+        window.onkeydown = (e) => {
+            if (respondendo !== 0) return;
+            if (e.key.toLowerCase() === 'q') ativ(1);
+            if (e.key.toLowerCase() === 'p') ativ(2);
+        };
+
+        function ativ(n) {
+            respondendo = n;
+            // Usa a cor do personagem selecionado para o brilho na arena
+            let corHex = n === 1 ? getColorHex(p1_color) : getColorHex(p2_color);
+            document.getElementById('box' + n).style.boxShadow = `0 0 40px ${corHex}`;
+            
+            document.getElementById('status').innerText = (n === 1 ? t1 : t2) + " ESTÁ RESPONDENDO...";
+            document.getElementById('input-area').style.display = 'block';
+            setTimeout(() => document.getElementById('ans').focus(), 10);
+        }
+
+        function getColorHex(name) {
+            const colors = { vermelho: "#ff0000", amarelo: "#ffff00", verde: "#00ff00", roxo: "#a020f0" };
+            return colors[name] || "#0f4";
+        }
+
+        document.getElementById('ans').onkeypress = (e) => {
+            if (e.key === 'Enter') {
+                let userAns = document.getElementById('ans').value.toLowerCase().trim();
+                if (userAns === pAtual.a.toLowerCase()) {
+                    if (respondendo === 1) p1_pts += 10; else p2_pts += 10;
+                } else {
+                    if (respondendo === 1) p1_pts -= 5; else p2_pts -= 5;
+                }
+                document.getElementById('pts1').innerText = "PONTOS: " + p1_pts;
+                document.getElementById('pts2').innerText = "PONTOS: " + p2_pts;
+                novaQ();
+            }
+        };
+
+        function final() {
+            change('scr-win');
+            let v = p1_pts > p2_pts ? t1 : (p2_pts > p1_pts ? t2 : "EMPATE");
+            document.getElementById('win-msg').innerHTML = v === "EMPATE" ? "EMPATE TÉCNICO!" : `DOMINAÇÃO CONCLUÍDA POR: ${v}`;
+        }
+    </script>
+</body>
+</html>

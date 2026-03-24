@@ -1,0 +1,425 @@
+/* --- CONFIGURAÇÕES GERAIS --- */
+body {
+    background-color: #000;
+    color: #00ff41;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    border: 2px solid #00ff41;
+    background: rgba(0, 20, 0, 0.9);
+    width: 850px;
+    height: 550px;
+    position: relative;
+    box-shadow: 0 0 20px #00ff41;
+    display: flex;
+    flex-direction: column;
+}
+
+/* --- SISTEMA DE TELAS --- */
+.screen {
+    display: none; /* Escondidas por padrão */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- TELA DE NOMES --- */
+.names-container {
+    display: flex;
+    gap: 50px;
+    align-items: center;
+    margin: 30px 0;
+}
+
+input {
+    background: #000;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 12px;
+    font-family: inherit;
+    text-align: center;
+    font-size: 18px;
+    outline: none;
+}
+
+input:focus {
+    box-shadow: 0 0 10px #00ff41;
+}
+
+/* --- SELEÇÃO DE PERSONAGENS --- */
+.char-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.char-card {
+    border: 1px solid #00ff41;
+    padding: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    background: rgba(0, 40, 0, 0.5);
+}
+
+.char-card:hover {
+    background: rgba(0, 255, 65, 0.2);
+    transform: scale(1.05);
+    border-color: #fff;
+}
+
+.char-card img {
+    width: 80px;
+    image-rendering: pixelated;
+}
+
+/* --- ARENA DE BATALHA & QUIZ --- */
+.arena {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.score {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 10px;
+    text-shadow: 0 0 5px #00ff41;
+}
+
+.quiz-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 255, 65, 0.05);
+    border: 1px dashed #00ff41;
+    border-radius: 10px;
+    margin: 0 20px;
+    min-height: 200px;
+}
+
+#timer {
+    font-size: 40px;
+    color: #ff3c3c;
+    margin-bottom: 15px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #ff0000;
+}
+
+#question-text {
+    font-size: 20px;
+    margin-bottom: 25px;
+    text-align: center;
+    color: #fff;
+    line-height: 1.4;
+}
+
+.answer-input {
+    width: 80%;
+    margin-bottom: 10px;
+}
+
+/* --- BARRAS DE VIDA (HP) --- */
+.hp-bar-bg {
+    width: 150px;
+    height: 15px;
+    background: #300;
+    border: 1px solid #00ff41;
+    margin-top: 10px;
+    overflow: hidden;
+}
+
+.hp-fill {
+    width: 100%;
+    height: 100%;
+    background: #0f4;
+    transition: width 0.5s ease-in-out;
+}
+
+/* --- BOTÕES --- */
+.btn-ui {
+    background: transparent;
+    border: 2px solid #00ff41;
+    color: #00ff41;
+    padding: 12px 35px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 16px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.btn-ui:hover {
+    background: #00ff41;
+    color: #000;
+    box-shadow: 0 0 20px #00ff41;
+}
+/* Configurações de Base */
+body {
+    background-color: #000;
+    color: #00ff41;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.game-container {
+    border: 2px solid #00ff41;
+    background: rgba(0, 20, 0, 0.9);
+    width: 850px;
+    height: 550px;
+    position: relative;
+    box-shadow: 0 0 20px #00ff41;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Sistema de Telas e Transição */
+.screen {
+    display: none; 
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    animation: fadeIn 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Inputs de Texto */
+input {
+    background: #000;
+    border: 1px solid #00ff41;
+    color: #00ff41;
+    padding: 10px;
+    font-family: inherit;
+    text-align: center;
+    font-size: 18px;
+    margin: 10px;
+}
+
+/* Grid de Personagens */
+.char-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.char-card {
+    border: 1px solid #00ff41;
+    padding: 10px;
+    cursor: pointer;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.char-card:hover {
+    background: rgba(0, 255, 65, 0.2);
+    transform: scale(1.1);
+}
+
+.char-card img { width: 70px; }
+
+/* Arena de Batalha */
+.arena {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.score { font-size: 18px; color: #fff; margin-bottom: 5px; }
+
+.quiz-container {
+    border: 1px dashed #00ff41;
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+}
+
+#timer {
+    font-size: 40px;
+    color: #ff3c3c;
+    font-weight: bold;
+    text-shadow: 0 0 10px #f00;
+}
+
+/* Barras de Vida */
+.hp-bar-bg { width: 150px; height: 12px; background: #300; border: 1px solid #00ff41; margin: 5px 0; }
+.hp-fill { width: 100%; height: 100%; background: #0f4; transition: 0.5s; }
+
+/* Botões */
+.btn-ui {
+    background: transparent;
+    border: 2px solid #00ff41;
+    color: #00ff41;
+    padding: 10px 25px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 18px;
+}
+
+.btn-ui:hover { background: #00ff41; color: #000; }
+/* ... (mantenha o que você já tem e adicione/ajuste estas partes) ... */
+
+.arena {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    flex: 1; /* Garante que ocupe o espaço central */
+}
+
+/* Centralização dos Fantasmas */
+.char-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 200px;
+}
+
+/* Destaque para quem apertou a tecla primeiro */
+.active-turn {
+    box-shadow: 0 0 30px #fff;
+    border: 2px solid #fff;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/* Tela de Vitória Estilo Hacker */
+.winner-text {
+    font-size: 30px;
+    text-align: center;
+    color: #0f4;
+    text-shadow: 0 0 10px #0f4;
+    padding: 20px;
+    line-height: 1.6;
+}
+
+.loser-msg {
+    color: #ff3c3c;
+    font-size: 18px;
+    margin-top: 20px;
+    font-style: italic;
+}
+body {
+    background-color: #000;
+    color: #00ff41;
+    font-family: 'Courier New', Courier, monospace;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.game-container {
+    border: 3px solid #00ff41;
+    background: #000;
+    width: 900px;
+    height: 600px;
+    box-shadow: 0 0 20px #00ff41;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.screen {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+/* Arena e Fantasmas */
+.arena {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.char-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.char-img {
+    width: 150px;
+    filter: drop-shadow(0 0 10px #00ff41);
+}
+
+.active-turn {
+    border: 2px solid #fff;
+    box-shadow: 0 0 20px #fff;
+    padding: 10px;
+    border-radius: 10px;
+}
+
+/* Quiz Central */
+.quiz-container {
+    border: 1px dashed #00ff41;
+    padding: 20px;
+    width: 350px;
+    min-height: 200px;
+}
+
+input {
+    background: #000;
+    border: 2px solid #00ff41;
+    color: #00ff41;
+    padding: 10px;
+    font-family: inherit;
+    text-align: center;
+    width: 80%;
+    margin-top: 15px;
+}
+
+.btn-ui {
+    background: transparent;
+    border: 2px solid #00ff41;
+    color: #00ff41;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-family: inherit;
+    margin-top: 20px;
+}
+
+.btn-ui:hover { background: #00ff41; color: #000; }
