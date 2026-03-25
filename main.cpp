@@ -2,6 +2,8 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <fstream> // IMPORTANTE: Adicionado para ler arquivos corretamente
+#include <sstream> // IMPORTANTE: Adicionado para ajudar na leitura
 
 int quemClicou = 0;
 
@@ -42,12 +44,18 @@ int main() {
         return res;
     });
 
-    // 5. ROTA PARA CARREGAR ARQUIVOS ESTÁTICOS (CSS, PNG, JPG)
-    // Isso busca os arquivos dentro da pasta 'templates' conforme definido no set_base
+    // 5. ROTA PARA CARREGAR ARQUIVOS ESTÁTICOS (CSS, PNG, JPG, MP4, GIF)
     CROW_ROUTE(app, "/<string>")([](std::string filename){
         try {
-            auto page = crow::mustache::load(filename);
-            crow::response res(page.render());
+            // Abre o arquivo de forma bruta (binária), sem tentar interpretar como HTML
+            std::ifstream is("templates/" + filename, std::ios::in | std::ios::binary);
+            if (!is) {
+                return crow::response(404);
+            }
+            
+            std::ostringstream contents;
+            contents << is.rdbuf();
+            crow::response res(contents.str());
             
             // Define o tipo de conteúdo para o navegador entender o que é cada arquivo
             if (filename.find(".css") != std::string::npos) {
@@ -56,7 +64,12 @@ int main() {
                 res.set_header("Content-Type", "image/png");
             } else if (filename.find(".jpg") != std::string::npos || filename.find(".jpeg") != std::string::npos) {
                 res.set_header("Content-Type", "image/jpeg");
+            } else if (filename.find(".gif") != std::string::npos) {
+                res.set_header("Content-Type", "image/gif");
+            } else if (filename.find(".mp4") != std::string::npos) {
+                res.set_header("Content-Type", "video/mp4"); // A MÁGICA DO VÍDEO AQUI!
             }
+            
             return res;
         } catch (...) {
             return crow::response(404);
