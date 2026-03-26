@@ -49,20 +49,20 @@
             <h2>ESCOLHA SEU AVATAR</h2>
             <p id="select-instruction" style="color: #0f4;">Vez do Time 1</p>
             <div class="avatar-container">
-                <div class="avatar-card" id="char0" onclick="sel('gif.gif', 'vermelho', 0)">
+                <div class="avatar-card" id="char0" onclick="sel('mario.gif', 'vermelho', 0)">
                     <img src="mario.gif">
                     <div class="avatar-name">MARIO</div>
                 </div>
-                <div class="avatar-card" id="char1" onclick="sel('gif.gif', 'amarelo', 1)">
-                    <img src="pacman.gif">
+                <div class="avatar-card" id="char1" onclick="sel('pac man.gif', 'amarelo', 1)">
+                    <img src="pac man.gif">
                     <div class="avatar-name">PAC MAN</div>
                 </div>
-                <div class="avatar-card" id="char2" onclick="sel('gif.gif', 'azul', 2)">
+                <div class="avatar-card" id="char2" onclick="sel('sonic.gif', 'azul', 2)">
                     <img src="sonic.gif">
                     <div class="avatar-name">SONIC</div>
                 </div>
-                <div class="avatar-card" id="char3" onclick="sel('gif.gif', 'laranja', 3)">
-                    <img src="gif.gif">
+                <div class="avatar-card" id="char3" onclick="sel('crash.gif', 'laranja', 3)">
+                    <img src="crash.gif">
                     <div class="avatar-name">CRASH</div>
                 </div>
             </div>
@@ -91,7 +91,7 @@
 
             <div class="arena">
                 <div id="box1" class="char-box">
-                    <img src="gif.gif" class="char-img" width="180">
+                    <img id="img-p1" src="gif.gif" class="char-img" width="180">
                     <p id="ln1" style="color: #0f4; font-size: 20px;"></p>
                     <div id="pts1" style="font-size: 22px;">PONTOS: 0</div>
                 </div>
@@ -105,7 +105,7 @@
                 </div>
 
                 <div id="box2" class="char-box">
-                    <img src="gif.gif" class="char-img" width="180">
+                    <img id="img-p2" src="gif.gif" class="char-img" width="180">
                     <p id="ln2" style="color: #0f4; font-size: 20px;"></p>
                     <div id="pts2" style="font-size: 22px;">PONTOS: 0</div>
                 </div>
@@ -125,17 +125,14 @@
         let p1_color = "", p2_color = "";
         
         let perguntas = [
-            // ÁREA DE INTEGRAÇÃO (Primeiro)
             {tema: "Área de Integração", q: "Qual a capital de Portugal?", a: "lisboa"},
             {tema: "Área de Integração", q: "O Brasil fica em qual continente?", a: "america do sul"},
             {tema: "Área de Integração", q: "Quantos anos tem um século?", a: "100"},
             
-            // INGLÊS (Segundo)
             {tema: "Inglês", q: "Como se escreve 'computador' em inglês?", a: "computer"},
             {tema: "Inglês", q: "Qual a tradução da palavra 'network'?", a: "rede"},
             {tema: "Inglês", q: "Como se diz 'vermelho' em inglês?", a: "red"},
             
-            // TIC (Terceiro)
             {tema: "TIC", q: "HTML significa HyperText Markup Language?", a: "sim"},
             {tema: "TIC", q: "O que significa a sigla T.I.A?", a: "tecnologia e informatica aplicada"},
             {tema: "TIC", q: "Qual o cérebro do computador (sigla)?", a: "cpu"}
@@ -217,6 +214,9 @@
         }
 
         function sel(img, colorName, idx) {
+            // TRAVA: Se o personagem já foi escolhido pelo P1, ignora o clique!
+            if (window.c1 === img) return;
+
             const card = document.getElementById('char' + idx);
             if (!window.c1) { 
                 window.c1 = img; p1_color = colorName;
@@ -250,6 +250,10 @@
             setTimeout(() => {
                 document.getElementById('ln1').innerText = t1;
                 document.getElementById('ln2').innerText = t2;
+                
+                document.getElementById('img-p1').src = window.c1;
+                document.getElementById('img-p2').src = window.c2;
+
                 setInterval(updateTimer, 1000);
                 setInterval(checarCelular, 500); 
                 novaQ();
@@ -282,6 +286,9 @@
             document.getElementById('box2').style.boxShadow = "none";
             document.getElementById('ans').value = "";
             respondendo = 0;
+
+            // ENVIA A PERGUNTA E RESPOSTA PARA O LOG DO C++ (RENDER)
+            fetch('/log_pergunta?q=' + encodeURIComponent(pAtual.q) + '&a=' + encodeURIComponent(pAtual.a));
         }
 
         function checarCelular() {
@@ -306,7 +313,6 @@
             setTimeout(() => document.getElementById('ans').focus(), 10);
         }
 
-        // CORES ATUALIZADAS AQUI!
         function getColorHex(name) {
             const colors = { 
                 vermelho: "#ff0000", 

@@ -2,15 +2,14 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
-#include <fstream> // IMPORTANTE: Adicionado para ler arquivos corretamente
-#include <sstream> // IMPORTANTE: Adicionado para ajudar na leitura
+#include <fstream> 
+#include <sstream> 
 
 int quemClicou = 0;
 
 int main() {
     crow::SimpleApp app;
 
-    // Configura o Crow para buscar HTML, CSS e Imagens dentro da pasta 'templates'
     crow::mustache::set_base("templates");
 
     // 1. ROTA DA TV (Página Principal)
@@ -44,20 +43,33 @@ int main() {
         return res;
     });
 
-    // 5. ROTA PARA CARREGAR ARQUIVOS ESTÁTICOS (CSS, PNG, JPG, MP4, GIF)
+    // ==========================================
+    // ROTA NOVA: RECEBE A PERGUNTA E MOSTRA NO LOG
+    // ==========================================
+    CROW_ROUTE(app, "/log_pergunta")([&](const crow::request& req){
+        auto q = req.url_params.get("q");
+        auto a = req.url_params.get("a");
+        
+        if(q != nullptr && a != nullptr) {
+            std::cout << "\n========================================" << std::endl;
+            std::cout << "[ GAME MASTER ] NOVA PERGUNTA NA TELA" << std::endl;
+            std::cout << "Pergunta: " << q << std::endl;
+            std::cout << "Resposta Correta: " << a << std::endl;
+            std::cout << "========================================\n" << std::endl;
+        }
+        return crow::response(200);
+    });
+
+    // 5. ROTA PARA CARREGAR ARQUIVOS ESTÁTICOS
     CROW_ROUTE(app, "/<string>")([](std::string filename){
         try {
-            // Abre o arquivo de forma bruta (binária), sem tentar interpretar como HTML
             std::ifstream is("templates/" + filename, std::ios::in | std::ios::binary);
-            if (!is) {
-                return crow::response(404);
-            }
+            if (!is) return crow::response(404);
             
             std::ostringstream contents;
             contents << is.rdbuf();
             crow::response res(contents.str());
             
-            // Define o tipo de conteúdo para o navegador entender o que é cada arquivo
             if (filename.find(".css") != std::string::npos) {
                 res.set_header("Content-Type", "text/css");
             } else if (filename.find(".png") != std::string::npos) {
@@ -67,7 +79,7 @@ int main() {
             } else if (filename.find(".gif") != std::string::npos) {
                 res.set_header("Content-Type", "image/gif");
             } else if (filename.find(".mp4") != std::string::npos) {
-                res.set_header("Content-Type", "video/mp4"); // A MÁGICA DO VÍDEO AQUI!
+                res.set_header("Content-Type", "video/mp4"); 
             }
             
             return res;
@@ -76,8 +88,6 @@ int main() {
         }
     });
 
-    // CONFIGURAÇÃO DE PORTA PARA O RENDER
-    // O Render atribui uma porta dinâmica, por isso usamos getenv("PORT")
     char* port = getenv("PORT");
     uint16_t portNumber = port ? (uint16_t)atoi(port) : 3000;
 
@@ -86,6 +96,5 @@ int main() {
     std::cout << "Porta utilizada: " << portNumber << std::endl;
     std::cout << "========================================\n" << std::endl;
     
-    // Inicia o servidor
     app.port(portNumber).multithreaded().run();
 }
