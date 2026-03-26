@@ -530,8 +530,8 @@ input[type="text"]:focus {
 /* Efeitos de Brilho dos Jogadores */
 .glow-vermelho { border-color: #ff0000; box-shadow: 0 0 20px #ff0000; }
 .glow-amarelo { border-color: #ffff00; box-shadow: 0 0 20px #ffff00; }
-.glow-verde { border-color: #00ff00; box-shadow: 0 0 20px #00ff00; }
-.glow-roxo { border-color: #a020f0; box-shadow: 0 0 20px #a020f0; }
+.glow-verde { border-color: #1100ff; box-shadow: 0 0 20px #001aff; }
+.glow-roxo { border-color: #ffa600; box-shadow: 0 0 20px #faab00; }
 
 .selected-p1 { border: 4px solid #fff !important; transform: scale(1.1); }
 .selected-p2 { border: 4px dotted #fff !important; transform: scale(1.1); }

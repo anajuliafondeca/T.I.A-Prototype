@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>T.I.A - Batalha Hacker</title>
+    <title>Trivial 80's - O jogos dos pontos</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
@@ -33,15 +33,15 @@
         </div>
 
         <div id="scr-start" class="screen" style="display: none;">
-            <h1 style="font-size: 100px; margin: 0; color: #0f4; text-shadow: 0 0 20px #0f4;">T.I.A</h1>
-            <p style="margin-bottom: 20px; letter-spacing: 5px;">SISTEMA DE DEFESA ATIVO</p>
-            <button class="btn-ui" onclick="transitionTo('scr-names')">INICIAR SISTEMA</button>
+            <h1 style="font-size: 100px; margin: 0; color: #0f4; text-shadow: 0 0 20px #0f4;">TRIVIAL_80's <br> O_jogos_dos_ pontos</h1>
+            <p style="margin-bottom: 20px; letter-spacing: 5px;">SISTEMA  ATIVO</p>
+            <button class="btn-ui" onclick="transitionTo('scr-names')">PLAY</button>
         </div>
 
         <div id="scr-names" class="screen">
-            <h2>IDENTIFIQUE OS AGENTES</h2>
-            <input type="text" id="n1" placeholder="NOME HACKER 1">
-            <input type="text" id="n2" placeholder="NOME HACKER 2">
+            <h2>IDENTIFIQUE OS COMPETIDORES</h2>
+            <input type="text" id="n1" placeholder="NOME DO GRUPO 1">
+            <input type="text" id="n2" placeholder="NOME DO GRUPO 2">
             <button class="btn-ui" onclick="saveNames()">PRÓXIMO</button>
         </div>
 
@@ -50,26 +50,26 @@
             <p id="select-instruction" style="color: #0f4;">Vez do Time 1</p>
             <div class="avatar-container">
                 <div class="avatar-card" id="char0" onclick="sel('gif.gif', 'vermelho', 0)">
-                    <img src="gif.gif">
-                    <div class="avatar-name">GHOST</div>
+                    <img src="mario.gif">
+                    <div class="avatar-name">MARIO</div>
                 </div>
                 <div class="avatar-card" id="char1" onclick="sel('gif.gif', 'amarelo', 1)">
-                    <img src="gif.gif">
-                    <div class="avatar-name">SHADOW</div>
+                    <img src="pacman.gif">
+                    <div class="avatar-name">PAC MAN</div>
                 </div>
-                <div class="avatar-card" id="char2" onclick="sel('gif.gif', 'verde', 2)">
-                    <img src="gif.gif">
-                    <div class="avatar-name">NEON</div>
+                <div class="avatar-card" id="char2" onclick="sel('gif.gif', 'azul', 2)">
+                    <img src="sonic.gif">
+                    <div class="avatar-name">SONIC</div>
                 </div>
-                <div class="avatar-card" id="char3" onclick="sel('gif.gif', 'roxo', 3)">
+                <div class="avatar-card" id="char3" onclick="sel('gif.gif', 'laranja', 3)">
                     <img src="gif.gif">
-                    <div class="avatar-name">VOID</div>
+                    <div class="avatar-name">CRASH</div>
                 </div>
             </div>
         </div>
 
         <div id="scr-qr" class="screen">
-            <h2>SINCRONIZAR TERMINAIS</h2>
+            <h2>SINCRONIZAR COMANDOS </h2>
             <div style="display: flex; gap: 40px; justify-content: center; align-items: center;">
                 <div class="char-box">
                     <p id="label-qr1" style="color:#0f4; font-weight: bold;"></p>
@@ -86,6 +86,9 @@
 
         <div id="scr-game" class="screen">
             <div id="timer" style="font-size: 35px; color: #ff0000; font-family: 'Courier New', monospace;">03:00</div>
+            
+            <h2 id="q-tema" style="color: #ff0; text-shadow: 0 0 15px #ff0; font-family: 'Courier New', monospace; font-size: 30px; margin: 15px 0 25px 0;"></h2>
+
             <div class="arena">
                 <div id="box1" class="char-box">
                     <img src="gif.gif" class="char-img" width="180">
@@ -120,15 +123,27 @@
         let t1, t2, p1_pts = 0, p2_pts = 0, respondendo = 0;
         let totalSegundos = 180; 
         let p1_color = "", p2_color = "";
+        
         let perguntas = [
-            {q: "Quanto é 50 + 50?", a: "100"},
-            {q: "Quanto é 9 x 9?", a: "81"},
-            {q: "HTML significa HyperText Markup Language?", a: "sim"},
-            {q: "Qual a capital do Brasil?", a: "brasilia"},
-            {q: "O que significa a sigla T.I.A?", a: "tecnologia e informatica aplicada"}
+            // ÁREA DE INTEGRAÇÃO (Primeiro)
+            {tema: "Área de Integração", q: "Qual a capital de Portugal?", a: "lisboa"},
+            {tema: "Área de Integração", q: "O Brasil fica em qual continente?", a: "america do sul"},
+            {tema: "Área de Integração", q: "Quantos anos tem um século?", a: "100"},
+            
+            // INGLÊS (Segundo)
+            {tema: "Inglês", q: "Como se escreve 'computador' em inglês?", a: "computer"},
+            {tema: "Inglês", q: "Qual a tradução da palavra 'network'?", a: "rede"},
+            {tema: "Inglês", q: "Como se diz 'vermelho' em inglês?", a: "red"},
+            
+            // TIC (Terceiro)
+            {tema: "TIC", q: "HTML significa HyperText Markup Language?", a: "sim"},
+            {tema: "TIC", q: "O que significa a sigla T.I.A?", a: "tecnologia e informatica aplicada"},
+            {tema: "TIC", q: "Qual o cérebro do computador (sigla)?", a: "cpu"}
         ];
+        
         let pAtual;
-        let jaPulou = false; // Variável para garantir que não pule duas vezes
+        let indicePergunta = 0; 
+        let jaPulou = false; 
 
         const canvas = document.getElementById('matrix-canvas');
         const ctx = canvas.getContext('2d');
@@ -160,7 +175,6 @@
             video.muted = false; 
             video.play().catch(e => console.log("Erro ao dar play:", e));
 
-            // TRAVA DE SEGURANÇA: Se o vídeo travar e o onended falhar, ele pula forçado em 4.5 segundos
             setTimeout(() => {
                 if (!jaPulou) {
                     console.log("Failsafe ativado! O vídeo engasgou, pulando...");
@@ -170,7 +184,7 @@
         }
 
         function pularLogo() {
-            if (jaPulou) return; // Se já pulou, ignora
+            if (jaPulou) return;
             jaPulou = true;
             
             const video = document.getElementById('video-logo');
@@ -252,7 +266,15 @@
         }
 
         function novaQ() {
-            pAtual = perguntas[Math.floor(Math.random()*perguntas.length)];
+            if (indicePergunta >= perguntas.length) {
+                final();
+                return;
+            }
+
+            pAtual = perguntas[indicePergunta];
+            indicePergunta++; 
+
+            document.getElementById('q-tema').innerText = "[ TEMA: " + pAtual.tema.toUpperCase() + " ]";
             document.getElementById('q-text').innerText = pAtual.q;
             document.getElementById('status').innerText = ">>> AGUARDANDO COMANDO...";
             document.getElementById('input-area').style.display = 'none';
@@ -284,15 +306,24 @@
             setTimeout(() => document.getElementById('ans').focus(), 10);
         }
 
+        // CORES ATUALIZADAS AQUI!
         function getColorHex(name) {
-            const colors = { vermelho: "#ff0000", amarelo: "#ffff00", verde: "#00ff00", roxo: "#a020f0" };
+            const colors = { 
+                vermelho: "#ff0000", 
+                amarelo: "#ffff00", 
+                azul: "#00aaff", 
+                laranja: "#ff6600" 
+            };
             return colors[name] || "#0f4";
         }
 
         document.getElementById('ans').onkeypress = (e) => {
             if (e.key === 'Enter') {
                 let userAns = document.getElementById('ans').value.toLowerCase().trim();
-                if (userAns === pAtual.a.toLowerCase()) {
+                let formatUserAns = userAns.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                let formatCorrectAns = pAtual.a.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+
+                if (formatUserAns === formatCorrectAns) {
                     if (respondendo === 1) p1_pts += 10; else p2_pts += 10;
                 } else {
                     if (respondendo === 1) p1_pts -= 5; else p2_pts -= 5;
