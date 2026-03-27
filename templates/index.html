@@ -124,18 +124,13 @@
         let totalSegundos = 180; 
         let p1_color = "", p2_color = "";
         
+        // --- AQUI ESTÁ A LISTA NOVA COM AS RESPOSTAS MÚLTIPLAS ---
         let perguntas = [
-            {tema: "Área de Integração", q: "Qual a capital de Portugal?", a: "lisboa"},
-            {tema: "Área de Integração", q: "O Brasil fica em qual continente?", a: "america do sul"},
-            {tema: "Área de Integração", q: "Quantos anos tem um século?", a: "100"},
-            
-            {tema: "Inglês", q: "Como se escreve 'computador' em inglês?", a: "computer"},
-            {tema: "Inglês", q: "Qual a tradução da palavra 'network'?", a: "rede"},
-            {tema: "Inglês", q: "Como se diz 'vermelho' em inglês?", a: "red"},
-            
-            {tema: "TIC", q: "HTML significa HyperText Markup Language?", a: "sim"},
-            {tema: "TIC", q: "O que significa a sigla T.I.A?", a: "tecnologia e informatica aplicada"},
-            {tema: "TIC", q: "Qual o cérebro do computador (sigla)?", a: "cpu"}
+            {tema: "Inglês", q: "Qual o animal de estimação do rei inglês Henry III?", a: ["urso polar", "urso"]},
+            {tema: "Área de Integração", q: "Onde fica a capital de Portugal?", a: ["lisboa"]},
+            {tema: "TIC", q: "Qual o cérebro do computador (sigla)?", a: ["cpu", "processador"]},
+            {tema: "Área de Integração", q: "O Brasil fica em qual continente?", a: ["america do sul", "america"]},
+            // Você pode adicionar mais perguntas aqui seguindo o mesmo padrão!
         ];
         
         let pAtual;
@@ -214,7 +209,6 @@
         }
 
         function sel(img, colorName, idx) {
-            // TRAVA: Se o personagem já foi escolhido pelo P1, ignora o clique!
             if (window.c1 === img) return;
 
             const card = document.getElementById('char' + idx);
@@ -287,8 +281,8 @@
             document.getElementById('ans').value = "";
             respondendo = 0;
 
-            // ENVIA A PERGUNTA E RESPOSTA PARA O LOG DO C++ (RENDER)
-            fetch('/log_pergunta?q=' + encodeURIComponent(pAtual.q) + '&a=' + encodeURIComponent(pAtual.a));
+            // ENVIA A PERGUNTA PARA O LOG DO C++ (RENDER)
+            fetch('/log_pergunta?q=' + encodeURIComponent(pAtual.q));
         }
 
         function checarCelular() {
@@ -323,17 +317,30 @@
             return colors[name] || "#0f4";
         }
 
+        // --- AQUI ESTÁ A LÓGICA NOVA QUE ACEITA VÁRIAS RESPOSTAS ---
         document.getElementById('ans').onkeypress = (e) => {
             if (e.key === 'Enter') {
                 let userAns = document.getElementById('ans').value.toLowerCase().trim();
                 let formatUserAns = userAns.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
-                let formatCorrectAns = pAtual.a.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                
+                let acertou = false;
 
-                if (formatUserAns === formatCorrectAns) {
+                if (Array.isArray(pAtual.a)) {
+                    for(let i = 0; i < pAtual.a.length; i++) {
+                        let formatCorrect = pAtual.a[i].toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+                        if (formatUserAns === formatCorrect) {
+                            acertou = true;
+                            break;
+                        }
+                    }
+                }
+
+                if (acertou) {
                     if (respondendo === 1) p1_pts += 10; else p2_pts += 10;
                 } else {
                     if (respondendo === 1) p1_pts -= 5; else p2_pts -= 5;
                 }
+                
                 document.getElementById('pts1').innerText = "PONTOS: " + p1_pts;
                 document.getElementById('pts2').innerText = "PONTOS: " + p2_pts;
                 novaQ();
