@@ -124,14 +124,53 @@
         let totalSegundos = 180; 
         let p1_color = "", p2_color = "";
         
-        // --- AQUI ESTÁ A LISTA NOVA COM AS RESPOSTAS MÚLTIPLAS ---
-        let perguntas = [
-            {tema: "Inglês", q: "Qual o animal de estimação do rei inglês Henry III?", a: ["urso polar", "urso"]},
-            {tema: "Área de Integração", q: "Onde fica a capital de Portugal?", a: ["lisboa"]},
-            {tema: "TIC", q: "Qual o cérebro do computador (sigla)?", a: ["cpu", "processador"]},
-            {tema: "Área de Integração", q: "O Brasil fica em qual continente?", a: ["america do sul", "america"]},
-            // Você pode adicionar mais perguntas aqui seguindo o mesmo padrão!
+        let perguntasOriginais = [
+            // INGLÊS
+            {tema: "Inglês", dificuldade: "Difícil", q: "Which English monarch kept a polar bear in the Tower of London in the 1250s?", a: ["henry iii", "henry 3"]},
+            {tema: "Inglês", dificuldade: "Difícil", q: "In 1858, what did Parliament use to reduce the smell of the River Thames?", a: ["curtains soaked in chloride of lime", "chloride of lime", "curtains"]},
+            {tema: "Inglês", dificuldade: "Fácil", q: "Where was William Shakespeare born?", a: ["united kingdom", "uk", "england", "inglaterra"]},
+            {tema: "Inglês", dificuldade: "Médio", q: "In the US, what do people call “trainers”?", a: ["sneakers"]},
+            {tema: "Inglês", dificuldade: "Difícil", q: "Which country gave women the right to vote in 1893?", a: ["new zealand", "nova zelandia"]},
+            {tema: "Inglês", dificuldade: "Médio", q: "Which country uses a musical instrument as a national symbol?", a: ["ireland", "irlanda"]},
+            {tema: "Inglês", dificuldade: "Difícil", q: "Which country hosted Rugby, Cricket, and Soccer World Cups?", a: ["england", "inglaterra", "uk"]},
+            {tema: "Inglês", dificuldade: "Médio", q: "Which country has the Union Jack on its flag?", a: ["australia", "austrália", "new zealand"]},
+
+            // INFORMÁTICA
+            {tema: "Informática", dificuldade: "Fácil", q: "Atalho para desfazer uma ação:", a: ["ctrl + z", "ctrl z", "ctrl+z"]},
+            {tema: "Informática", dificuldade: "Difícil", q: "1 GB equivale a:", a: ["1024 mb", "1024mb", "1024"]},
+            {tema: "Informática", dificuldade: "Médio", q: "Extensão padrão do Excel:", a: [".xlsx", "xlsx"]},
+            {tema: "Informática", dificuldade: "Fácil", q: "Armazenamento permanente de dados:", a: ["hdd", "ssd", "nvme", "hd", "disco rigido"]},
+            {tema: "Informática", dificuldade: "Médio", q: "Qual é a menor unidade de armazenamento:", a: ["bit"]},
+            {tema: "Informática", dificuldade: "Difícil", q: "O que significa BIOS:", a: ["basic input output system"]},
+            {tema: "Informática", dificuldade: "Médio", q: "O que GPU significa no Inglês:", a: ["graphics processing unit"]},
+            {tema: "Informática", dificuldade: "Fácil", q: "Componente que executa cálculos:", a: ["cpu", "processador"]},
+
+            // INTEGRAÇÃO (COMUNICAÇÃO EM DITADURA)
+            {tema: "Integração", dificuldade: "Fácil", q: "Como se chama o controle da informação feito pelo governo?", a: ["censura"]},
+            {tema: "Integração", dificuldade: "Difícil", q: "Como se chama a divulgação de mensagens para influenciar o povo?", a: ["propaganda"]},
+            {tema: "Integração", dificuldade: "Fácil", q: "Quem controla os meios de comunicação numa ditadura?", a: ["governo", "estado", "ditador"]},
+            {tema: "Integração", dificuldade: "Difícil", q: "Como se chama quando não se pode falar livremente?", a: ["repressao", "censura"]},
+            {tema: "Integração", dificuldade: "Fácil", q: "O que é proibido criticar numa ditadura?", a: ["governo", "ditador", "regime"]},
+            {tema: "Integração", dificuldade: "Médio", q: "Como se chama a falta de liberdade de expressão?", a: ["censura", "repressao"]},
+            {tema: "Integração", dificuldade: "Difícil", q: "Qual é o objetivo do controle da informação?", a: ["poder", "controle"]},
+            {tema: "Integração", dificuldade: "Médio", q: "Como se chama quando só uma versão da verdade é permitida?", a: ["censura", "propaganda"]}
         ];
+
+        // --- MÁGICA DO RODÍZIO DE MATÉRIAS ---
+        let perguntas = [];
+        let pIngles = perguntasOriginais.filter(p => p.tema === "Inglês");
+        let pInfo = perguntasOriginais.filter(p => p.tema === "Informática");
+        let pInteg = perguntasOriginais.filter(p => p.tema === "Integração");
+        
+        // Pega a quantidade da matéria que tem mais perguntas para não deixar nenhuma de fora
+        let maximoDePerguntas = Math.max(pIngles.length, pInfo.length, pInteg.length);
+        
+        for(let i = 0; i < maximoDePerguntas; i++) {
+            if(pIngles[i]) perguntas.push(pIngles[i]); // Puxa uma de Inglês
+            if(pInfo[i]) perguntas.push(pInfo[i]);     // Puxa uma de Informática
+            if(pInteg[i]) perguntas.push(pInteg[i]);   // Puxa uma de Integração
+        }
+        // --------------------------------------
         
         let pAtual;
         let indicePergunta = 0; 
@@ -169,7 +208,6 @@
 
             setTimeout(() => {
                 if (!jaPulou) {
-                    console.log("Failsafe ativado! O vídeo engasgou, pulando...");
                     pularLogo();
                 }
             }, 4500);
@@ -272,7 +310,9 @@
             pAtual = perguntas[indicePergunta];
             indicePergunta++; 
 
-            document.getElementById('q-tema').innerText = "[ TEMA: " + pAtual.tema.toUpperCase() + " ]";
+            let textoDificuldade = pAtual.dificuldade ? " | NÍVEL: " + pAtual.dificuldade.toUpperCase() : "";
+            document.getElementById('q-tema').innerText = "[ TEMA: " + pAtual.tema.toUpperCase() + textoDificuldade + " ]";
+            
             document.getElementById('q-text').innerText = pAtual.q;
             document.getElementById('status').innerText = ">>> AGUARDANDO COMANDO...";
             document.getElementById('input-area').style.display = 'none';
@@ -281,7 +321,6 @@
             document.getElementById('ans').value = "";
             respondendo = 0;
 
-            // ENVIA A PERGUNTA PARA O LOG DO C++ (RENDER)
             fetch('/log_pergunta?q=' + encodeURIComponent(pAtual.q));
         }
 
@@ -317,7 +356,6 @@
             return colors[name] || "#0f4";
         }
 
-        // --- AQUI ESTÁ A LÓGICA NOVA QUE ACEITA VÁRIAS RESPOSTAS ---
         document.getElementById('ans').onkeypress = (e) => {
             if (e.key === 'Enter') {
                 let userAns = document.getElementById('ans').value.toLowerCase().trim();
